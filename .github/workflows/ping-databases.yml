@@ -1,4 +1,31 @@
+name: Ping All Supabase Projects
+
 on:
   schedule:
     - cron: '0 0 */3 * *'
   workflow_dispatch:
+
+jobs:
+  ping_databases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping FitLedger
+        run: |
+          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
+          -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
+          "${{ secrets.FITLEDGER_URL }}/rest/v1/_keep_alive?select=*"
+
+      - name: Ping Events App
+        run: |
+          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
+          -H "apikey: ${{ secrets.EVENTS_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
+          "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
+
+      - name: Ping Audit Tool
+        run: |
+          curl -s -o /dev/null -w "Audit Status: %{http_code}\n" \
+          -H "apikey: ${{ secrets.AUDIT_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.AUDIT_KEY }}" \
+          "${{ secrets.AUDIT_URL }}/rest/v1/_keep_alive?select=*"
