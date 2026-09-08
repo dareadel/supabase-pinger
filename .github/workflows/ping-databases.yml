@@ -22,10 +22,3 @@ jobs:
           -H "apikey: ${{ secrets.EVENTS_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
           "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
-
-      - name: Ping Audit Tool
-        run: |
-          curl -s -o /dev/null -w "Audit Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.AUDIT_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.AUDIT_KEY }}" \
-          "${{ secrets.AUDIT_URL }}/rest/v1/_keep_alive?select=*"
