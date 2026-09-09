@@ -11,14 +11,26 @@ jobs:
     steps:
       - name: Ping FitLedger
         run: |
-          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
-          "${{ secrets.FITLEDGER_URL }}/rest/v1/_keep_alive?select=*"
+          CLEAN_URL=$(echo "${{ secrets.FITLEDGER_URL }}" | tr -d '[:space:]')
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
+            "$CLEAN_URL/rest/v1/_keep_alive?select=*")
+          echo "FitLedger Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Warning: FitLedger returned status $STATUS"
+            exit 0
+          fi
 
       - name: Ping Events App
         run: |
-          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.EVENTS_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
-          "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
+          CLEAN_URL_EVENTS=$(echo "${{ secrets.EVENTS_URL }}" | tr -d '[:space:]')
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.EVENTS_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
+            "$CLEAN_URL_EVENTS/rest/v1/_keep_alive?select=*")
+          echo "Events Status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Warning: Events App returned status $STATUS"
+            exit 0
+          fi
