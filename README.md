@@ -1,0 +1,1 @@
+[![Ping All Supabase Projects](https://github.com/dareadel/supabase-pinger/actions/workflows/ping-databases.yml/badge.svg)](https://github.com/dareadel/supabase-pinger/actions/workflows/ping-databases.yml)
