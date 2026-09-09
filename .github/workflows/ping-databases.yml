@@ -1,21 +1,24 @@
 name: Ping All Supabase Projects
 
 on:
+  schedule:
+    - cron: '0 0 */3 * *'
   workflow_dispatch:
 
 jobs:
   ping_databases:
     runs-on: ubuntu-latest
     steps:
-      - name: Ultimate Diagnostic Test
+      - name: Ping FitLedger
         run: |
-          URL_START=$(echo "${{ secrets.FITLEDGER_URL }}" | cut -c 1-5)
-          echo "The FITLEDGER_URL secret starts with: $URL_START"
-          
-          if [ "$URL_START" = "eyJhb" ]; then
-            echo "🚨 ALARM: That is an API Key, not a URL! The secrets are swapped."
-          elif [ "$URL_START" = "https" ]; then
-            echo "✅ It starts with https. The format is correct."
-          else
-            echo "⚠️ It starts with something else. Check the spelling."
-          fi
+          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
+          -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
+          "${{ secrets.FITLEDGER_URL }}/rest/v1/_keep_alive?select=*"
+
+      - name: Ping Events App
+        run: |
+          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
+          -H "apikey: ${{ secrets.EVENTS_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
+          "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
