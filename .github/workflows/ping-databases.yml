@@ -1,4 +1,3 @@
-# DEBUG VERSION: Checking secret visibility
 name: Ping All Supabase Projects
 
 on:
@@ -10,22 +9,22 @@ jobs:
   ping_databases:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug Secret Visibility
-        run: |
-          echo "Checking FitLedger URL..."
-          echo "Value: ${{ secrets.FITLEDGER_URL }}"
-          echo "If the line above just says 'Value: ' with nothing after it, the secret is empty!"
-
       - name: Ping FitLedger
         run: |
-          curl -v -s -o /dev/null -w "\nFitLedger Status: %{http_code}\n" \
+          # This line strips any hidden spaces or line breaks from the URL
+          CLEAN_URL=$(echo "${{ secrets.FITLEDGER_URL }}" | tr -d '[:space:]')
+          
+          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
           -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
-          "${{ secrets.FITLEDGER_URL }}/rest/v1/_keep_alive?select=*"
+          "$CLEAN_URL/rest/v1/_keep_alive?select=*"
 
       - name: Ping Events App
         run: |
-          curl -v -s -o /dev/null -w "\nEvents Status: %{http_code}\n" \
+          # This line strips any hidden spaces or line breaks from the URL
+          CLEAN_URL_EVENTS=$(echo "${{ secrets.EVENTS_URL }}" | tr -d '[:space:]')
+
+          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
           -H "apikey: ${{ secrets.EVENTS_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
-          "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
+          "$CLEAN_URL_EVENTS/rest/v1/_keep_alive?select=*"
