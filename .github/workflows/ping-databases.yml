@@ -1,24 +1,15 @@
 name: Ping All Supabase Projects
 
 on:
-  schedule:
-    - cron: '0 0 */3 * *'
   workflow_dispatch:
 
 jobs:
   ping_databases:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping FitLedger
+      - name: Reveal URL Structure
         run: |
-          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
-          "${{ secrets.FITLEDGER_URL }}/rest/v1/_keep_alive?select=*"
-
-      - name: Ping Events App
-        run: |
-          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.EVENTS_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
-          "${{ secrets.EVENTS_URL }}/rest/v1/_keep_alive?select=*"
+          URL="${{ secrets.FITLEDGER_URL }}"
+          # This masks your project ID but shows the domain ending
+          MASKED_URL=$(echo "$URL" | sed 's/https:\/\/[^.]*/https:\/\/[HIDDEN_ID]/')
+          echo "The runner is trying to connect to: $MASKED_URL"
