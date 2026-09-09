@@ -1,30 +1,21 @@
 name: Ping All Supabase Projects
 
 on:
-  schedule:
-    - cron: '0 0 */3 * *'
   workflow_dispatch:
 
 jobs:
   ping_databases:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping FitLedger
+      - name: Ultimate Diagnostic Test
         run: |
-          # This line strips any hidden spaces or line breaks from the URL
-          CLEAN_URL=$(echo "${{ secrets.FITLEDGER_URL }}" | tr -d '[:space:]')
+          URL_START=$(echo "${{ secrets.FITLEDGER_URL }}" | cut -c 1-5)
+          echo "The FITLEDGER_URL secret starts with: $URL_START"
           
-          curl -s -o /dev/null -w "FitLedger Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.FITLEDGER_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.FITLEDGER_KEY }}" \
-          "$CLEAN_URL/rest/v1/_keep_alive?select=*"
-
-      - name: Ping Events App
-        run: |
-          # This line strips any hidden spaces or line breaks from the URL
-          CLEAN_URL_EVENTS=$(echo "${{ secrets.EVENTS_URL }}" | tr -d '[:space:]')
-
-          curl -s -o /dev/null -w "Events Status: %{http_code}\n" \
-          -H "apikey: ${{ secrets.EVENTS_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.EVENTS_KEY }}" \
-          "$CLEAN_URL_EVENTS/rest/v1/_keep_alive?select=*"
+          if [ "$URL_START" = "eyJhb" ]; then
+            echo "🚨 ALARM: That is an API Key, not a URL! The secrets are swapped."
+          elif [ "$URL_START" = "https" ]; then
+            echo "✅ It starts with https. The format is correct."
+          else
+            echo "⚠️ It starts with something else. Check the spelling."
+          fi
